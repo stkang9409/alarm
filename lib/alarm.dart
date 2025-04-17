@@ -34,11 +34,17 @@ class Alarm {
 
   static final _ringing = BehaviorSubject<AlarmSet>.seeded(AlarmSet.empty());
 
+  static final _unidentifiableRinging = BehaviorSubject<int?>.seeded(null);
+
   /// Stream of the scheduled alarms.
   static ValueStream<AlarmSet> get scheduled => _scheduled.stream;
 
   /// Stream of the ringing alarms.
   static ValueStream<AlarmSet> get ringing => _ringing.stream;
+
+  /// Stream of the unidentifiable ringing alarms.
+  static ValueStream<int?> get unidentifiableRinging =>
+      _unidentifiableRinging.stream;
 
   /// Stream of the alarm updates.
   @Deprecated('Use [scheduled] and [ringing] streams instead.')
@@ -56,6 +62,7 @@ class Alarm {
     AlarmTriggerApiImpl.ensureInitialized(
       alarmRang: alarmRang,
       alarmStopped: _alarmStopped,
+      unidentifiableAlarmRang: _unidentifiableAlarmRang,
     );
 
     await AlarmStorage.init();
@@ -206,17 +213,23 @@ class Alarm {
       final alarm = await getAlarm(id);
       if (alarm == null) {
         if (_scheduled.value.containsId(id)) {
-          _log.severe('Alarm with id $id was not found but was '
-              'ringing=$isRinging and marked as scheduled.');
+          _log.severe(
+            'Alarm with id $id was not found but was '
+            'ringing=$isRinging and marked as scheduled.',
+          );
         }
         if (_ringing.value.containsId(id)) {
-          _log.severe('Alarm with id $id was not found but was '
-              'ringing=$isRinging and marked as ringing.');
+          _log.severe(
+            'Alarm with id $id was not found but was '
+            'ringing=$isRinging and marked as ringing.',
+          );
         }
       } else {
         if (isRinging != _ringing.value.contains(alarm)) {
-          _log.severe('Alarm with id $id is ringing=$isRinging but was '
-              'not marked as such.');
+          _log.severe(
+            'Alarm with id $id is ringing=$isRinging but was '
+            'not marked as such.',
+          );
         }
       }
     }
@@ -259,5 +272,9 @@ class Alarm {
     _ringing.add(_ringing.value.removeById(alarmId));
 
     updateStream.add(alarmId);
+  }
+
+  static void _unidentifiableAlarmRang(int alarmId) {
+    _unidentifiableRinging.add(alarmId);
   }
 }
