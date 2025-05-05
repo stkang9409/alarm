@@ -23,6 +23,7 @@ class AlarmSettings extends Equatable {
     this.androidFullScreenIntent = true,
     this.allowAlarmOverlap = false,
     this.iOSBackgroundAudio = true,
+    this.iosAlarmWithBackup = true,
     this.androidStopAlarmOnTermination = true,
     this.payload,
   });
@@ -58,6 +59,9 @@ class AlarmSettings extends Equatable {
 
       // Default `iOSBackgroundAudio` to true for v4
       json['iOSBackgroundAudio'] = json['iOSBackgroundAudio'] ?? true;
+
+      // Default `iosAlarmWithBackup` to true for v4
+      json['iosAlarmWithBackup'] = json['iosAlarmWithBackup'] ?? true;
 
       // Convert dateTime to string so the default JSON parser can handle it
       final dateTimeValue = json['dateTime'];
@@ -168,6 +172,11 @@ class AlarmSettings extends Equatable {
   /// Defaults to `true`. Has no effect on Android.
   final bool iOSBackgroundAudio;
 
+  /// Whether to use a backup notification when the app is killed.
+  ///
+  /// Defaults to `true`.
+  final bool iosAlarmWithBackup;
+
   /// Whether to stop the alarm when an Android task is terminated by e.g.
   /// swiping away the app from the recent apps list.
   ///
@@ -196,6 +205,7 @@ class AlarmSettings extends Equatable {
         androidFullScreenIntent: androidFullScreenIntent,
         allowAlarmOverlap: allowAlarmOverlap,
         iOSBackgroundAudio: iOSBackgroundAudio,
+        iosAlarmWithBackup: iosAlarmWithBackup,
         androidStopAlarmOnTermination: androidStopAlarmOnTermination,
       );
 
@@ -220,6 +230,7 @@ class AlarmSettings extends Equatable {
     bool? androidFullScreenIntent,
     bool? allowAlarmOverlap,
     bool? iOSBackgroundAudio,
+    bool? iosAlarmWithBackup,
     bool? androidStopAlarmOnTermination,
     String? Function()? payload,
   }) {
@@ -237,6 +248,7 @@ class AlarmSettings extends Equatable {
           androidFullScreenIntent ?? this.androidFullScreenIntent,
       allowAlarmOverlap: allowAlarmOverlap ?? this.allowAlarmOverlap,
       iOSBackgroundAudio: iOSBackgroundAudio ?? this.iOSBackgroundAudio,
+      iosAlarmWithBackup: iosAlarmWithBackup ?? this.iosAlarmWithBackup,
       androidStopAlarmOnTermination:
           androidStopAlarmOnTermination ?? this.androidStopAlarmOnTermination,
       payload: payload?.call() ?? this.payload,
@@ -256,6 +268,7 @@ class AlarmSettings extends Equatable {
         androidFullScreenIntent,
         allowAlarmOverlap,
         iOSBackgroundAudio,
+        iosAlarmWithBackup,
         androidStopAlarmOnTermination,
         payload,
       ];

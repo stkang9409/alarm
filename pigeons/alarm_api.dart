@@ -29,6 +29,7 @@ class AlarmSettingsWire {
     required this.allowAlarmOverlap,
     required this.iOSBackgroundAudio,
     required this.androidStopAlarmOnTermination,
+    required this.iosAlarmWithBackup,
   });
 
   final int id;
@@ -42,6 +43,7 @@ class AlarmSettingsWire {
   final bool androidFullScreenIntent;
   final bool allowAlarmOverlap;
   final bool iOSBackgroundAudio;
+  final bool iosAlarmWithBackup;
   final bool androidStopAlarmOnTermination;
 }
 

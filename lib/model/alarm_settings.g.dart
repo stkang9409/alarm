@@ -30,6 +30,8 @@ AlarmSettings _$AlarmSettingsFromJson(Map<String, dynamic> json) =>
               $checkedConvert('allowAlarmOverlap', (v) => v as bool? ?? false),
           iOSBackgroundAudio:
               $checkedConvert('iOSBackgroundAudio', (v) => v as bool? ?? true),
+          iosAlarmWithBackup:
+              $checkedConvert('iosAlarmWithBackup', (v) => v as bool? ?? true),
           payload: $checkedConvert('payload', (v) => v as String?),
         );
         return val;
@@ -49,5 +51,6 @@ Map<String, dynamic> _$AlarmSettingsToJson(AlarmSettings instance) =>
       'androidFullScreenIntent': instance.androidFullScreenIntent,
       'allowAlarmOverlap': instance.allowAlarmOverlap,
       'iOSBackgroundAudio': instance.iOSBackgroundAudio,
+      'iosAlarmWithBackup': instance.iosAlarmWithBackup,
       if (instance.payload case final value?) 'payload': value,
     };

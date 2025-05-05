@@ -7,9 +7,9 @@ class NotificationManager: NSObject {
 
     private static let categoryWithoutActionIdentifier = "ALARM_CATEGORY_NO_ACTION"
     private static let categoryWithActionIdentifierPrefix = "ALARM_CATEGORY_WITH_ACTION_"
-    private static let notificationIdentifierPrefix = "ALARM_NOTIFICATION_"
+    public static let notificationIdentifierPrefix = "ALARM_NOTIFICATION_"
     private static let stopActionIdentifier = "ALARM_STOP_ACTION"
-    private static let userInfoAlarmIdKey = "ALARM_ID"
+    public static let userInfoAlarmIdKey = "ALARM_ID"
 
     private static let logger = OSLog(subsystem: ALARM_BUNDLE, category: "NotificationManager")
 
@@ -176,6 +176,32 @@ class NotificationManager: NSObject {
             os_log(.debug, log: NotificationManager.logger, "Warning notification scheduled.")
         } catch {
             os_log(.error, log: NotificationManager.logger, "Error when scheduling warning notification: %@", error.localizedDescription)
+        }
+    }
+
+    func cancelAllBackupNotifications(forAlarmId id: Int) async {
+        let center = UNUserNotificationCenter.current()
+        let pendingNotifs = await center.pendingNotificationRequests()
+        
+        // Cancel all backup notifications for this alarm ID
+        let backupIdentifiers = pendingNotifs
+            .filter { $0.identifier.hasPrefix("\(NotificationManager.notificationIdentifierPrefix)\(id)_backup_") }
+            .map { $0.identifier }
+        
+        if !backupIdentifiers.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: backupIdentifiers)
+            os_log(.debug, log: NotificationManager.logger, "Cancelled %d backup notifications for alarm ID=%d", backupIdentifiers.count, id)
+        }
+        
+        // Also dismiss any delivered backup notifications
+        let deliveredNotifs = await center.deliveredNotifications()
+        let deliveredBackupIdentifiers = deliveredNotifs
+            .filter { $0.request.identifier.hasPrefix("\(NotificationManager.notificationIdentifierPrefix)\(id)_backup_") }
+            .map { $0.request.identifier }
+        
+        if !deliveredBackupIdentifiers.isEmpty {
+            center.removeDeliveredNotifications(withIdentifiers: deliveredBackupIdentifiers)
+            os_log(.debug, log: NotificationManager.logger, "Dismissed %d delivered backup notifications for alarm ID=%d", deliveredBackupIdentifiers.count, id)
         }
     }
 }

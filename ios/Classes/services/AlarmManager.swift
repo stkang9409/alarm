@@ -44,12 +44,19 @@ class AlarmManager: NSObject {
             }
         }
 
+        // Schedule backup notifications if enabled
+        if alarmSettings.iosAlarmWithBackup {
+            await self.scheduleBackupNotifications(for: alarmSettings)
+        }
+
         os_log(.info, log: AlarmManager.logger, "Set alarm for ID=%d complete.", alarmSettings.id)
     }
 
     func stopAlarm(id: Int, cancelNotif: Bool) async {
         if cancelNotif {
             NotificationManager.shared.cancelNotification(id: id)
+            // Cancel all backup notifications
+            await NotificationManager.shared.cancelAllBackupNotifications(forAlarmId: id)
         }
         NotificationManager.shared.dismissNotification(id: id)
 
@@ -164,8 +171,10 @@ class AlarmManager: NSObject {
 
         await NotificationManager.shared.showNotification(id: config.settings.id, notificationSettings: config.settings.notificationSettings)
 
-        // Ensure background audio is stopped before ringing alarm.
-        BackgroundAudioManager.shared.stop()
+        // Cancel all backup notifications since the alarm is ringing
+        if config.settings.iosAlarmWithBackup {
+            await NotificationManager.shared.cancelAllBackupNotifications(forAlarmId: id)
+        }
 
         await AlarmRingManager.shared.start(
             registrar: self.registrar,
@@ -183,6 +192,29 @@ class AlarmManager: NSObject {
         await self.notifyAlarmRang(id: id)
 
         os_log(.info, log: AlarmManager.logger, "Ring alarm for ID=%d complete.", id)
+    }
+
+    private func scheduleBackupNotifications(for alarmSettings: AlarmSettings) async {
+        let content = UNMutableNotificationContent()
+        content.title = alarmSettings.notificationSettings.title
+        content.body = alarmSettings.notificationSettings.body
+        content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: alarmSettings.assetAudioPath))
+        content.userInfo = [NotificationManager.userInfoAlarmIdKey: alarmSettings.id]
+
+        // Schedule 30 backup notifications with 10-second intervals
+        for i in 0..<30 {
+            let triggerDate = alarmSettings.dateTime.addingTimeInterval(Double(i * 10))
+            let trigger = UNCalendarNotificationTrigger(
+                dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: triggerDate),
+                repeats: false
+            )
+            let request = UNNotificationRequest(
+                identifier: "\(NotificationManager.notificationIdentifierPrefix)\(alarmSettings.id)_backup_\(i)",
+                content: content,
+                trigger: trigger
+            )
+            try? await UNUserNotificationCenter.current().add(request)
+        }
     }
 
     @MainActor
@@ -234,18 +266,6 @@ class AlarmManager: NSObject {
             AppTerminateManager.shared.startMonitoring()
         } else {
             AppTerminateManager.shared.stopMonitoring()
-        }
-
-        if !self.alarms.contains(where: { $1.state == .ringing }) && self.alarms.contains(where: { $1.state == .scheduled && $1.settings.iOSBackgroundAudio }) {
-            BackgroundAudioManager.shared.start(registrar: self.registrar)
-        } else {
-            BackgroundAudioManager.shared.stop()
-        }
-
-        if self.alarms.contains(where: { $1.state == .scheduled }) {
-            BackgroundTaskManager.enable()
-        } else {
-            BackgroundTaskManager.disable()
         }
 
         if self.alarms.contains(where: { $1.state == .ringing && $1.settings.vibrate }) {

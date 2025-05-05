@@ -161,6 +161,7 @@ struct AlarmSettingsWire: Hashable {
   var androidFullScreenIntent: Bool
   var allowAlarmOverlap: Bool
   var iOSBackgroundAudio: Bool
+  var iosAlarmWithBackup: Bool
   var androidStopAlarmOnTermination: Bool
 
 
@@ -177,7 +178,8 @@ struct AlarmSettingsWire: Hashable {
     let androidFullScreenIntent = pigeonVar_list[8] as! Bool
     let allowAlarmOverlap = pigeonVar_list[9] as! Bool
     let iOSBackgroundAudio = pigeonVar_list[10] as! Bool
-    let androidStopAlarmOnTermination = pigeonVar_list[11] as! Bool
+    let iosAlarmWithBackup = pigeonVar_list[11] as! Bool
+    let androidStopAlarmOnTermination = pigeonVar_list[12] as! Bool
 
     return AlarmSettingsWire(
       id: id,
@@ -191,6 +193,7 @@ struct AlarmSettingsWire: Hashable {
       androidFullScreenIntent: androidFullScreenIntent,
       allowAlarmOverlap: allowAlarmOverlap,
       iOSBackgroundAudio: iOSBackgroundAudio,
+      iosAlarmWithBackup: iosAlarmWithBackup,
       androidStopAlarmOnTermination: androidStopAlarmOnTermination
     )
   }
@@ -207,6 +210,7 @@ struct AlarmSettingsWire: Hashable {
       androidFullScreenIntent,
       allowAlarmOverlap,
       iOSBackgroundAudio,
+      iosAlarmWithBackup,
       androidStopAlarmOnTermination,
     ]
   }

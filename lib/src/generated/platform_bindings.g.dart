@@ -74,6 +74,7 @@ class AlarmSettingsWire {
     required this.androidFullScreenIntent,
     required this.allowAlarmOverlap,
     required this.iOSBackgroundAudio,
+    required this.iosAlarmWithBackup,
     required this.androidStopAlarmOnTermination,
   });
 
@@ -99,6 +100,8 @@ class AlarmSettingsWire {
 
   bool iOSBackgroundAudio;
 
+  bool iosAlarmWithBackup;
+
   bool androidStopAlarmOnTermination;
 
   List<Object?> _toList() {
@@ -114,6 +117,7 @@ class AlarmSettingsWire {
       androidFullScreenIntent,
       allowAlarmOverlap,
       iOSBackgroundAudio,
+      iosAlarmWithBackup,
       androidStopAlarmOnTermination,
     ];
   }
@@ -136,7 +140,8 @@ class AlarmSettingsWire {
       androidFullScreenIntent: result[8]! as bool,
       allowAlarmOverlap: result[9]! as bool,
       iOSBackgroundAudio: result[10]! as bool,
-      androidStopAlarmOnTermination: result[11]! as bool,
+      iosAlarmWithBackup: result[11]! as bool,
+      androidStopAlarmOnTermination: result[12]! as bool,
     );
   }
 
