@@ -52,7 +52,7 @@ public class AlarmApiImpl: NSObject, AlarmApi {
     }
 
     func appRefresh() async {
-        BackgroundAudioManager.shared.refresh(registrar: self.registrar)
+        // BackgroundAudioManager.shared.refresh(registrar: self.registrar)
         await self.manager.checkAlarms()
     }
 }
